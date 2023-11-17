@@ -9,7 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import com.gl4.tp_3_fragement.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() , ActionMode.Callback{
     private lateinit var binding: ActivityMainBinding
     private  lateinit var actionMode: ActionMode
 
@@ -26,6 +26,11 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.fragment, FragmentClock(), null)
             .addToBackStack(null)
             .commit()
+
+        binding.setBtn.setOnLongClickListener{
+            actionMode = this@MainActivity.startActionMode(this@MainActivity)!!
+            return@setOnLongClickListener true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -35,14 +40,16 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.switchh)
+        if(item.itemId == R.id.action_switch)
         {
-            binding.switchWidget.isChecked = !binding.switchWidget.isChecked
+            binding.switchWidgett.isChecked = !binding.switchWidgett.isChecked
             setTime(null)
         }
         return super.onOptionsItemSelected(item)
     }
+
 
 
     fun setTime(view : View?) {
@@ -50,10 +57,37 @@ class MainActivity : AppCompatActivity() {
         var transaction = fragmentManager.beginTransaction()
         var fragmentClock = FragmentClock()
         var bundle = Bundle()
-        bundle.putBoolean("digitalOK",binding.switchWidget.isChecked)
+        bundle.putBoolean("digitalOK",binding.switchWidgett.isChecked)
         fragmentClock.arguments = bundle
         transaction.replace(R.id.fragment,fragmentClock)
         transaction.commit()
+    }
+    override fun onCreateActionMode(actionMode: ActionMode, menu: Menu?): Boolean {
+        val inflater: MenuInflater = actionMode.menuInflater
+        inflater.inflate(R.menu.context_mode_menu, menu)
+        return true
+    }
+
+    override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {
+        return true
+    }
+
+    override fun onActionItemClicked(actionMode: ActionMode?, menuItem: MenuItem?): Boolean {
+        return when (menuItem?.itemId) {
+            R.id.action_color -> {
+                binding.setBtn.setBackgroundColor(
+                    resources.getColor(
+                        R.color.prink
+                    )
+                )
+                actionMode?.finish()
+                true
+            }
+            else -> false
+        }
+    }
+
+    override fun onDestroyActionMode(p0: ActionMode?) {
     }
 
 
